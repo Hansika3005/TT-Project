@@ -1,0 +1,68 @@
+import { useAuthStore } from "../../store/authStore";
+import { Bell, Search, Moon, Sun } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Input } from "../ui/Input";
+
+export default function Topbar() {
+  const { user } = useAuthStore();
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    // Check initial theme from system or class
+    if (document.documentElement.classList.contains("dark")) {
+      setTheme("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("dark");
+      setTheme("dark");
+    } else {
+      root.classList.remove("dark");
+      setTheme("light");
+    }
+  };
+
+  return (
+    <header className="h-16 border-b border-border/40 bg-background/60 backdrop-blur-xl sticky top-0 z-30 flex items-center justify-between px-6 shadow-sm">
+      <div className="flex-1 flex max-w-sm">
+        <div className="relative w-full group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            type="search"
+            placeholder="Search dashboard..."
+            className="pl-10 h-10 w-full !rounded-full bg-muted/40 border-border/20 focus-visible:bg-background/80 focus-visible:ring-primary/30 transition-all duration-300"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={toggleTheme}
+          className="p-2.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-all duration-200"
+          title="Toggle theme"
+        >
+          {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+        </button>
+        <button className="p-2.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground relative transition-all duration-200 group">
+          <Bell size={18} />
+          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary ring-2 ring-background group-hover:scale-110 transition-transform"></span>
+        </button>
+        
+        <div className="flex items-center gap-3 pl-4 ml-2 border-l border-border/40">
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-bold leading-none text-foreground">{user?.name || "User"}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-primary mt-1 opacity-70">
+              {user?.role || "GUEST"}
+            </p>
+          </div>
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-black shadow-lg glow-primary-sm transform hover:scale-105 transition-transform cursor-pointer">
+            {user?.name?.charAt(0)?.toUpperCase() || "U"}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
