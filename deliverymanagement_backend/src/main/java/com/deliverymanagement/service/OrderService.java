@@ -88,6 +88,11 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    // Admin-only convenience API used by AdminController
+    public List<Order> getAllOrders() {
+        return orderRepo.findAll();
+    }
+
     public Order assignAgent(String orderId, String agentId) {
 
         Order order = orderRepo.findById(orderId)
