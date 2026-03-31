@@ -30,6 +30,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        // Public endpoints should never be blocked by JWT parsing/validation.
+        return path.startsWith("/api/auth/") || path.equals("/api/health");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
@@ -42,7 +49,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
-            username = jwtUtil.extractUsername(token); // ✅ FIXED
+            try {
+                username = jwtUtil.extractUsername(token);
+            } catch (Exception ignored) {
+                // Invalid/expired token on a request that does not require auth.
+                // Let the chain continue as anonymous instead of forcing 403.
+            }
         }
 
         if (username != null &&
