@@ -6,7 +6,7 @@
 
 export const UI_ROLES = [
   { label: 'Customer',       value: 'CUSTOMER',        backendValue: 'CUSTOMER' },
-  { label: 'Delivery Agent', value: 'DELIVERY_AGENT',  backendValue: 'CUSTOMER' }, // Map to CUSTOMER until backend supports it
+  { label: 'Delivery Agent', value: 'DELIVERY_AGENT',  backendValue: 'DELIVERY_AGENT' },
   { label: 'Admin',          value: 'ADMIN',           backendValue: 'ADMIN'    },
 ];
 
@@ -21,7 +21,7 @@ export const getRoleLabel = (backendRole) => {
   const mapping = {
     ADMIN:    'Admin',
     CUSTOMER: 'Customer',
-    AGENT:    'Delivery Agent',
+    DELIVERY_AGENT: 'Delivery Agent',
   };
   return mapping[backendRole] || backendRole;
 };

@@ -15,10 +15,10 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "AGENT", "CUSTOMER"] },
-    { name: "Orders",    href: "/orders",    icon: Package,         roles: ["ADMIN", "AGENT", "CUSTOMER"] },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN", "DELIVERY_AGENT", "CUSTOMER"] },
+    { name: "Orders",    href: "/orders",    icon: Package,         roles: ["ADMIN", "DELIVERY_AGENT", "CUSTOMER"] },
     { name: "Agents",    href: "/agents",    icon: Truck,           roles: ["ADMIN"] },
-    { name: "Customers", href: "/customers", icon: Users,           roles: ["ADMIN", "AGENT"] },
+    { name: "Customers", href: "/customers", icon: Users,           roles: ["ADMIN", "DELIVERY_AGENT"] },
   ];
 
   const filteredItems = navItems.filter((item) =>

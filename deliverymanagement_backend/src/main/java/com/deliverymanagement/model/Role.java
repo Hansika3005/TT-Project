@@ -1,5 +1,5 @@
 package com.deliverymanagement.model;
 
 public enum Role {
-    CUSTOMER, ADMIN
+    CUSTOMER, DELIVERY_AGENT, ADMIN
 }

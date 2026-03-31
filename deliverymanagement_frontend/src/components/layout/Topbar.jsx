@@ -2,6 +2,7 @@ import { useAuthStore } from "../../store/authStore";
 import { Bell, Search, Moon, Sun } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Input } from "../ui/Input";
+import { getRoleLabel } from "../../utils/roleMapping";
 
 export default function Topbar() {
   const { user } = useAuthStore();
@@ -55,7 +56,7 @@ export default function Topbar() {
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold leading-none text-foreground">{user?.name || "User"}</p>
             <p className="text-[10px] font-bold uppercase tracking-widest text-primary mt-1 opacity-70">
-              {user?.role || "GUEST"}
+              {user?.displayRole || getRoleLabel(user?.role) || "GUEST"}
             </p>
           </div>
           <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center font-black shadow-lg glow-primary-sm transform hover:scale-105 transition-transform cursor-pointer">

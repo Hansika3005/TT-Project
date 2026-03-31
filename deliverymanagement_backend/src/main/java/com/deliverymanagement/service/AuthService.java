@@ -2,6 +2,7 @@ package com.deliverymanagement.service;
 
 import com.deliverymanagement.dto.LoginRequest;
 import com.deliverymanagement.dto.RegisterRequest;
+import com.deliverymanagement.dto.AuthResponse;
 import com.deliverymanagement.model.User;
 import com.deliverymanagement.repository.UserRepository;
 import com.deliverymanagement.util.JwtUtil;
@@ -38,7 +39,7 @@ public class AuthService {
     }
 
     // ✅ LOGIN (EMAIL BASED)
-    public String login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
 
         User user = userRepo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -47,6 +48,12 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        return jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getUsername());
+        AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole() != null ? user.getRole().toString() : null
+        );
+        return new AuthResponse(token, userInfo);
     }
 }
