@@ -13,6 +13,6 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
-        sync: false
+        value: "https://project-qic85i10t-23eg105p57-2359s-projects.vercel.app"
       - key: PORT
         value: 8080

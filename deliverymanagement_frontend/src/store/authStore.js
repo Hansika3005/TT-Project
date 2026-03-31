@@ -20,7 +20,8 @@ export const useAuthStore = create(
       checkHealth: async () => {
         try {
           const { default: api } = await import('../services/api');
-          await api.get('/orders');
+          // Use the lightweight public health endpoint instead of an authenticated route
+          await api.get('/health');
           set({ isBackendDown: false });
           return true;
         } catch (error) {

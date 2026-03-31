@@ -26,7 +26,8 @@ export default function Login() {
         const selectedRole = UI_ROLES.find(r => r.value === data.role);
         
         const success = await registerUser({
-          name: data.name,
+          // Backend expects `username` (DTO field). We send it explicitly.
+          username: data.name,
           email: data.email,
           password: data.password,
           role: toBackendRole(data.role || "CUSTOMER"),

@@ -3,7 +3,9 @@ import axiosRetry from 'axios-retry';
 import { useAuthStore } from '../store/authStore';
 import { toast } from 'sonner';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+// Default to your Render backend if Vercel env var isn't configured yet.
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://delivery-management-backend-f6jn.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

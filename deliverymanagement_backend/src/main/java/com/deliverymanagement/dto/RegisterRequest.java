@@ -1,9 +1,13 @@
 package com.deliverymanagement.dto;
 
 import com.deliverymanagement.model.Role;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class RegisterRequest {
 
+    // Frontend may send `name`; backend DTO uses `username`.
+    // JsonAlias lets Spring/Jackson accept both keys.
+    @JsonAlias("name")
     private String username;
     private String email;
     private String password;
