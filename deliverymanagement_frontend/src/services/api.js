@@ -4,8 +4,14 @@ import { useAuthStore } from '../store/authStore';
 import { toast } from 'sonner';
 
 // Default to your Render backend if Vercel env var isn't configured yet.
-const API_BASE_URL =
+// Also normalize so base always ends with `/api` (backend routes are `/api/auth/*`, `/api/health`).
+const API_BASE_URL_RAW =
   import.meta.env.VITE_API_BASE_URL || 'https://delivery-management-backend-f6jn.onrender.com/api';
+
+const API_BASE_URL = (() => {
+  const trimmed = API_BASE_URL_RAW.replace(/\/+$/, '');
+  return /\/api$/i.test(trimmed) ? trimmed : `${trimmed}/api`;
+})();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
