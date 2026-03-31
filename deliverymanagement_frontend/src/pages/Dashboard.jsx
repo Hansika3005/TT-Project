@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useOrderStore } from "../store/orderStore";
 import { useAuthStore } from "../store/authStore";
+import { normalizeRole } from "../utils/roleMapping";
 import {
   Package, Truck, CircleDollarSign, Clock,
   TrendingUp, TrendingDown, ArrowRight,
@@ -101,15 +102,22 @@ function ChartTooltip({ active, payload, label }) {
 export default function Dashboard() {
   const { dashboardStats, fetchDashboardStats, isLoading } = useOrderStore();
   const { user } = useAuthStore();
+  const role = normalizeRole(user?.role);
 
   useEffect(() => { fetchDashboardStats(); }, [fetchDashboardStats]);
 
   // ── Role-Based KPI Filtering ───────────────────────────────────────────────
   const filteredKpis = KPI_CONFIG.filter((cfg) => {
-    if (user?.role === "ADMIN") return true;
+    if (role === "ADMIN") return true;
     // Hide revenue/financials for Customers and Agents
     return cfg.key !== "revenue";
   });
+
+  const dashboardTitleByRole = {
+    ADMIN: "Admin Dashboard",
+    DELIVERY_AGENT: "Delivery Agent Dashboard",
+    CUSTOMER: "Customer Dashboard",
+  };
 
   return (
     <div className="space-y-8">
@@ -128,7 +136,7 @@ export default function Dashboard() {
             Operations Console
           </h1>
           <p className="text-muted-foreground mt-1 text-sm font-medium">
-            Personalized metrics for your {user?.displayRole || "Dashboard"}
+            Personalized metrics for your {dashboardTitleByRole[role] || "Dashboard"}
           </p>
         </div>
         <motion.a

@@ -22,7 +22,7 @@ export default function Sidebar() {
   ];
 
   const filteredItems = navItems.filter((item) =>
-    item.roles.includes(user?.role || "CUSTOMER")
+    item.roles.includes(user?.role)
   );
 
   const handleLogout = () => {

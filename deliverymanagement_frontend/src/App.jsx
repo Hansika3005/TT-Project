@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import Orders from './pages/Orders';
 import Agents from './pages/Agents';
 import Customers from './pages/Customers';
+import { normalizeRole } from './utils/roleMapping';
 
 /**
  * PublicRoute: Only accessible when NOT logged in.
@@ -30,8 +31,9 @@ const PublicRoute = () => {
  */
 const ProtectedRoute = ({ allowedRoles } = {}) => {
   const { isAuthenticated, user } = useAuthStore();
+  const role = normalizeRole(user?.role);
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (allowedRoles && !allowedRoles.includes(user?.role)) return <Navigate to="/dashboard" replace />;
+  if (allowedRoles && !allowedRoles.includes(role)) return <Navigate to="/dashboard" replace />;
   return <Outlet />;
 };
 

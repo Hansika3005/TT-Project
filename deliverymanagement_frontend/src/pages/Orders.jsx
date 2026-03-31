@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { cn } from "../utils/cn";
+import { normalizeRole } from "../utils/roleMapping";
 import {
   Search, Download, Plus, Truck, Clock,
   Trash2, PackageOpen, ShoppingCart,
@@ -48,6 +49,7 @@ export default function Orders() {
   const { orders, fetchOrders, isLoading, createOrder, updateOrderStatus, deleteOrder } = useOrderStore();
   const { agents, fetchAgents } = useAgentStore();
   const { user, isBackendDown } = useAuthStore();
+  const role = normalizeRole(user?.role);
 
   const [search, setSearch]             = useState("");
   const [isModalOpen, setIsModalOpen]   = useState(false);
@@ -58,9 +60,9 @@ export default function Orders() {
 
   // ── Role-Based Filtering ───────────────────────────────────────────────────
   const roleFiltered = orders.filter((order) => {
-    if (user?.role === "ADMIN") return true;
+    if (role === "ADMIN") return true;
 
-    if (user?.role === "DELIVERY_AGENT") {
+    if (role === "DELIVERY_AGENT") {
       return order.agentId === user.id ||
              order.agentName?.toLowerCase() === user.name?.toLowerCase();
     }
@@ -99,7 +101,7 @@ export default function Orders() {
         <div>
           <h1 className="text-3xl font-black tracking-tight">Orders</h1>
           <p className="text-sm text-muted-foreground mt-0.5 font-medium">
-            {user?.role === 'ADMIN' ? 'Manage and track all delivery orders' : 'Track your own orders and deliveries'}
+            {role === 'ADMIN' ? 'Manage and track all delivery orders' : 'Track your own orders and deliveries'}
           </p>
         </div>
         <div className="flex gap-2">

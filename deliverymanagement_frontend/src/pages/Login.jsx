@@ -30,7 +30,7 @@ export default function Login() {
           username: data.name,
           email: data.email,
           password: data.password,
-          role: toBackendRole(data.role || "CUSTOMER"),
+          role: toBackendRole(data.role),
           displayRole: selectedRole?.label || "Customer",
         });
         if (success) { setIsRegister(false); reset(); }

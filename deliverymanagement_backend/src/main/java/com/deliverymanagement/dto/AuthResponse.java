@@ -3,6 +3,7 @@ package com.deliverymanagement.dto;
 public class AuthResponse {
 
     private String token;
+    private String role;
     private UserInfo user;
 
     public AuthResponse() {}
@@ -13,6 +14,7 @@ public class AuthResponse {
 
     public AuthResponse(String token, UserInfo user) {
         this.token = token;
+        this.role = user != null ? user.getRole() : null;
         this.user = user;
     }
 
@@ -30,6 +32,14 @@ public class AuthResponse {
 
     public void setUser(UserInfo user) {
         this.user = user;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public static class UserInfo {

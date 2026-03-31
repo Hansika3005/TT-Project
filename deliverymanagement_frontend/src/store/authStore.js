@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { authService } from '../services/authService';
 import { toast } from 'sonner';
-import { getRoleLabel } from '../utils/roleMapping';
+import { getRoleLabel, normalizeRole } from '../utils/roleMapping';
 
 export const useAuthStore = create(
   persist(
@@ -12,7 +12,7 @@ export const useAuthStore = create(
       isAuthenticated: false,
       isLoading: false,
       isBackendDown: false,
-      // Store UI roles locally since backend only has ADMIN/CUSTOMER
+      // Store UI role labels locally for display preference
       pendingDisplayRoles: {}, 
 
       setBackendDown: (isDown) => set({ isBackendDown: isDown }),
@@ -46,7 +46,7 @@ export const useAuthStore = create(
             return false;
           }
 
-          const resolvedRole = data?.user?.role || data?.role;
+          const resolvedRole = normalizeRole(data?.user?.role || data?.role);
           if (!resolvedRole) {
             toast.error('Login response missing user role.');
             set({ isLoading: false });
@@ -63,7 +63,8 @@ export const useAuthStore = create(
             displayRole: savedDisplayRole || getRoleLabel(resolvedRole),
           };
 
-          console.log('[Auth Debug] role from login response:', resolvedRole);
+          console.log('[Auth Debug] response.data.role:', data?.role);
+          console.log('[Auth Debug] normalized role from login response:', resolvedRole);
 
           set({ user, token, isAuthenticated: true, isLoading: false, isBackendDown: false });
           console.log('[Auth Debug] role stored in frontend state:', user.role);

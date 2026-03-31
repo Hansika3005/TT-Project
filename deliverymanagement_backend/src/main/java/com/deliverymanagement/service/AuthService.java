@@ -60,7 +60,7 @@ public class AuthService {
         AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(
                 user.getUsername(),
                 user.getEmail(),
-                user.getRole() != null ? user.getRole().toString() : null
+                user.getRole() != null ? user.getRole().name() : null
         );
         return new AuthResponse(token, userInfo);
     }
