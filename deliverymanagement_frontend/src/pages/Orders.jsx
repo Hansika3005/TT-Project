@@ -59,14 +59,12 @@ export default function Orders() {
   // ── Role-Based Filtering ───────────────────────────────────────────────────
   const roleFiltered = orders.filter((order) => {
     if (user?.role === "ADMIN") return true;
-    
-    // If frontend says "Delivery Agent" (stored as CUSTOMER in backend)
-    if (user?.displayRole === "Delivery Agent") {
-      // Mock logic: either matched by ID or name
-      return order.agentId === user.id || 
+
+    if (user?.role === "DELIVERY_AGENT") {
+      return order.agentId === user.id ||
              order.agentName?.toLowerCase() === user.name?.toLowerCase();
     }
-    
+
     // Regular Customer
     return order.customerName?.toLowerCase() === user?.name?.toLowerCase();
   });

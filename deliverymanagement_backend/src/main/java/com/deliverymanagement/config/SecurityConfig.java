@@ -50,8 +50,8 @@ public class SecurityConfig {
                         // ADMIN ONLY
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // CUSTOMER + ADMIN
-                        .requestMatchers("/api/orders/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        // CUSTOMER + DELIVERY_AGENT + ADMIN
+                        .requestMatchers("/api/orders/**").hasAnyRole("CUSTOMER", "DELIVERY_AGENT", "ADMIN")
 
                         // DELIVERY AGENT
                         .requestMatchers("/api/agent/**").hasRole("DELIVERY_AGENT")

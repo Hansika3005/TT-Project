@@ -46,17 +46,27 @@ export const useAuthStore = create(
             return false;
           }
 
+          const resolvedRole = data?.user?.role || data?.role;
+          if (!resolvedRole) {
+            toast.error('Login response missing user role.');
+            set({ isLoading: false });
+            return false;
+          }
+
           // Recovery displayRole: check if we have a locally saved preference for this email
           const savedDisplayRole = get().pendingDisplayRoles[credentials.email.toLowerCase()];
-          
-          const user = data?.user || {
-            name: credentials.email.split('@')[0],
-            email: credentials.email.toLowerCase(),
-            role: data?.role || 'CUSTOMER',
-            displayRole: savedDisplayRole || getRoleLabel(data?.role || 'CUSTOMER'),
+
+          const user = {
+            name: data?.user?.name || credentials.email.split('@')[0],
+            email: data?.user?.email || credentials.email.toLowerCase(),
+            role: resolvedRole,
+            displayRole: savedDisplayRole || getRoleLabel(resolvedRole),
           };
 
+          console.log('[Auth Debug] role from login response:', resolvedRole);
+
           set({ user, token, isAuthenticated: true, isLoading: false, isBackendDown: false });
+          console.log('[Auth Debug] role stored in frontend state:', user.role);
           toast.success('Welcome back!');
           return true;
         } catch (error) {

@@ -7,10 +7,13 @@ import com.deliverymanagement.model.User;
 import com.deliverymanagement.repository.UserRepository;
 import com.deliverymanagement.util.JwtUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepo;
     private final JwtUtil jwtUtil;
@@ -22,6 +25,9 @@ public class AuthService {
 
     // ✅ REGISTER
     public String register(RegisterRequest request) {
+        if (request.getRole() == null) {
+            throw new RuntimeException("Role is required");
+        }
 
         if (userRepo.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
@@ -34,6 +40,7 @@ public class AuthService {
         user.setRole(request.getRole());
 
         userRepo.save(user);
+        log.info("Registered user email={} role={}", user.getEmail(), user.getRole());
 
         return "REGISTERED";
     }
@@ -49,6 +56,7 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(user.getUsername());
+        log.info("Login success email={} dbRole={}", user.getEmail(), user.getRole());
         AuthResponse.UserInfo userInfo = new AuthResponse.UserInfo(
                 user.getUsername(),
                 user.getEmail(),

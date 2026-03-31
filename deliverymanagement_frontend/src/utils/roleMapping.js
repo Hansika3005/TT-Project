@@ -13,7 +13,7 @@ export const UI_ROLES = [
 /** Map a UI-selected role value to what the backend expects */
 export const toBackendRole = (uiRole) => {
   const found = UI_ROLES.find((r) => r.value === uiRole);
-  return found ? found.backendValue : 'CUSTOMER';
+  return found ? found.backendValue : uiRole;
 };
 
 /** Get a human-friendly label for a backend role string */
