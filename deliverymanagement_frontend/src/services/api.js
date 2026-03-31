@@ -75,6 +75,7 @@ api.interceptors.response.use(
   },
   (error) => {
     const { isBackendDown, setBackendDown, logout } = useAuthStore.getState();
+    const suppressGlobalErrorToast = Boolean(error.config?.suppressGlobalErrorToast);
 
     if (error.response) {
       // If we got a response, the backend is UP
@@ -84,22 +85,32 @@ api.interceptors.response.use(
       const backendMsg = data?.message || data?.error || data?.detail || (typeof data === 'string' ? data : null);
 
       if (status === 401) {
-        logout();
-        showToast(backendMsg || 'Session expired. Please log in again.');
+        if (!suppressGlobalErrorToast) {
+          logout();
+          showToast(backendMsg || 'Session expired. Please log in again.');
+        }
       } else if (status === 403) {
-        showToast(backendMsg || 'Unauthorized action.');
+        if (!suppressGlobalErrorToast) {
+          showToast(backendMsg || 'Unauthorized action.');
+        }
       } else if (status >= 500) {
-        showToast(backendMsg || 'Server error.');
+        if (!suppressGlobalErrorToast) {
+          showToast(backendMsg || 'Server error.');
+        }
       } else {
-        showToast(backendMsg || 'An unexpected error occurred.');
+        if (!suppressGlobalErrorToast) {
+          showToast(backendMsg || 'An unexpected error occurred.');
+        }
       }
     } else if (error.request) {
       // No response received — backend is likely offline
       setBackendDown(true);
-      showToast('Backend server is not running. Please start Spring Boot.');
+      if (!suppressGlobalErrorToast) {
+        showToast('Backend server is not running. Please start Spring Boot.');
+      }
       console.warn('[API]: Connection failed. Backend status set to OFFLINE.');
     } else {
-      if (error.message !== 'Backend is offline') {
+      if (error.message !== 'Backend is offline' && !suppressGlobalErrorToast) {
         showToast(error.message || 'Request setup error.');
       }
     }

@@ -21,7 +21,7 @@ export const useAuthStore = create(
         try {
           const { default: api } = await import('../services/api');
           // Use the lightweight public health endpoint instead of an authenticated route
-          await api.get('/health');
+          await api.get('/health', { suppressGlobalErrorToast: true });
           set({ isBackendDown: false });
           return true;
         } catch (error) {
