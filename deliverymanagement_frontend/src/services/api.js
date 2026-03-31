@@ -16,7 +16,8 @@ const API_BASE_URL = (() => {
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 10000,
+  // Render free instances can cold-start slowly; avoid false "offline" states.
+  timeout: 60000,
 });
 
 // Retry on network errors and 5xx – up to 3 attempts with exponential backoff
@@ -112,7 +113,7 @@ api.interceptors.response.use(
       // No response received — backend is likely offline
       setBackendDown(true);
       if (!suppressGlobalErrorToast) {
-        showToast('Backend server is not running. Please start Spring Boot.');
+        showToast('Backend is waking up on Render. Please wait up to 1 minute and retry.');
       }
       console.warn('[API]: Connection failed. Backend status set to OFFLINE.');
     } else {

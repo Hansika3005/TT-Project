@@ -84,9 +84,18 @@ export default function Orders() {
 
   const handleExport = () => {
     if (!canManageOrders) return;
-    const csv = ["ID,Customer,Amount,Status,Date",
-      ...roleFiltered.map((o) => `${o.id},${o.customerName},${o.amount},${o.status},${o.date}`)
-    ].join("\n");
+    const header = "ID,Customer,Email,Amount,Status,Date,Agent";
+    const rows = roleFiltered.map((o) => {
+      const id = o.id ?? "";
+      const customer = o.customerName ?? "";
+      const email = o.customerEmail ?? "";
+      const amount = o.amount ?? "";
+      const status = o.status ?? "";
+      const date = o.date ?? "";
+      const agent = o.agentName ?? "";
+      return `${id},${customer},${email},${amount},${status},${date},${agent}`;
+    });
+    const csv = [header, ...rows].join("\n");
     const a = document.createElement("a");
     a.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
     a.download = "orders.csv";

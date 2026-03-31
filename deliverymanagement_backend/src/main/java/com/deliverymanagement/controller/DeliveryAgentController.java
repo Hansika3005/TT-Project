@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/agent")
+@RequestMapping({"/api/agent", "/api/agents"})
 public class DeliveryAgentController {
 
     private final DeliveryAgentService service;

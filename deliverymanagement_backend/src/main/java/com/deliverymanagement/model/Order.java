@@ -13,6 +13,14 @@ public class Order {
     private String itemName;
     private String address;
     private String status;
+    private Double amount;
+    private String date; // ISO string
+
+    // Flattened customer/agent fields for frontend compatibility
+    private String customerName;
+    private String customerEmail;
+    private String agentId;
+    private String agentName;
 
     @DBRef
     private User customer;
@@ -38,6 +46,30 @@ public class Order {
         return status;
     }
 
+    public Double getAmount() {
+        return amount;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
     public User getCustomer() {
         return customer;
     }
@@ -60,6 +92,30 @@ public class Order {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
     }
 
     public void setCustomer(User customer) {

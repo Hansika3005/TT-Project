@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -35,30 +36,56 @@ public class OrderService {
         this.customerRepo = customerRepo;
     }
 
-    public Order createOrder(OrderRequest req) {
-
-        // Get the first user from the database as default customer
-        List<User> users = userRepo.findAll();
-        User user;
-        if (!users.isEmpty()) {
-            user = users.get(0);
-        } else {
-            throw new RuntimeException("No users found. Please register first.");
-        }
+    public Order createOrder(OrderRequest req, String username) {
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Order o = new Order();
         o.setCustomer(user);
+        o.setCustomerName(req.getCustomerName() != null ? req.getCustomerName() : user.getUsername());
+        o.setCustomerEmail(user.getEmail());
+
+        // Frontend fields
+        o.setAmount(req.getAmount());
+        o.setDate(req.getDate() != null ? req.getDate() : Instant.now().toString());
+        o.setStatus(req.getStatus() != null ? req.getStatus() : "PENDING");
+
+        // Backward compatibility
         o.setItemName(req.getItemName());
         o.setAddress(req.getAddress());
-        o.setStatus("PENDING");
+
+        if (req.getAgentId() != null && !req.getAgentId().isBlank()) {
+            DeliveryAgent agent = agentRepo.findById(req.getAgentId())
+                    .orElseThrow(() -> new RuntimeException("Agent not found"));
+            o.setDeliveryAgent(agent);
+            o.setAgentId(agent.getId());
+            o.setAgentName(agent.getName());
+        }
 
         Order saved = orderRepo.save(o);
         syncCustomerStats(user);
         return saved;
     }
 
-    public List<Order> getAllOrders() {
-        return orderRepo.findAll();
+    public List<Order> getOrdersForUser(String username, List<String> roles) {
+        List<Order> all = orderRepo.findAll();
+        if (roles.contains("ROLE_ADMIN")) return all;
+
+        if (roles.contains("ROLE_DELIVERY_AGENT")) {
+            return all.stream()
+                    .filter(o -> o.getAgentName() != null && o.getAgentName().equalsIgnoreCase(username))
+                    .collect(Collectors.toList());
+        }
+
+        // CUSTOMER
+        return all.stream()
+                .filter(o -> {
+                    if (o.getCustomer() != null && o.getCustomer().getUsername() != null) {
+                        return o.getCustomer().getUsername().equalsIgnoreCase(username);
+                    }
+                    return o.getCustomerName() != null && o.getCustomerName().equalsIgnoreCase(username);
+                })
+                .collect(Collectors.toList());
     }
 
     public Order assignAgent(String orderId, String agentId) {
@@ -70,6 +97,8 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
 
         order.setDeliveryAgent(agent);
+        order.setAgentId(agent.getId());
+        order.setAgentName(agent.getName());
 
         return orderRepo.save(order);
     }
