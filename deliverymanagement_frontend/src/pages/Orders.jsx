@@ -50,6 +50,7 @@ export default function Orders() {
   const { agents, fetchAgents } = useAgentStore();
   const { user, isBackendDown } = useAuthStore();
   const role = normalizeRole(user?.role);
+  const canManageOrders = role === "ADMIN" || role === "DELIVERY_AGENT";
 
   const [search, setSearch]             = useState("");
   const [isModalOpen, setIsModalOpen]   = useState(false);
@@ -105,19 +106,23 @@ export default function Orders() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport} size="sm">
-            <Download className="h-4 w-4" /> Export CSV
-          </Button>
-          <div title={isBackendDown ? "Backend is offline" : ""}>
-            <Button 
-              onClick={() => !isBackendDown && setIsModalOpen(true)} 
-              size="sm"
-              disabled={isBackendDown}
-              className={isBackendDown ? "opacity-50 cursor-not-allowed" : ""}
-            >
-              <Plus className="h-4 w-4" /> New Order
-            </Button>
-          </div>
+          {canManageOrders && (
+            <>
+              <Button variant="outline" onClick={handleExport} size="sm">
+                <Download className="h-4 w-4" /> Export CSV
+              </Button>
+              <div title={isBackendDown ? "Backend is offline" : ""}>
+                <Button 
+                  onClick={() => !isBackendDown && setIsModalOpen(true)} 
+                  size="sm"
+                  disabled={isBackendDown}
+                  className={isBackendDown ? "opacity-50 cursor-not-allowed" : ""}
+                >
+                  <Plus className="h-4 w-4" /> New Order
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </motion.div>
 
@@ -195,34 +200,36 @@ export default function Orders() {
                     </td>
                     <td className="px-4 py-3.5"><StatusBadge status={order.status} /></td>
                     <td className="px-4 py-3.5">
-                      <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
-                        {order.status !== "DELIVERED" && (
+                      {canManageOrders && (
+                        <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                          {order.status !== "DELIVERED" && (
+                            <div title={isBackendDown ? "Backend is offline" : ""}>
+                              <button
+                                disabled={isBackendDown}
+                                onClick={() => updateOrderStatus(order.id, order.status === "PENDING" ? "SHIPPED" : "DELIVERED")}
+                                className={cn(
+                                  "p-1.5 rounded-md transition-colors",
+                                  isBackendDown ? "opacity-30 cursor-not-allowed" : "hover:bg-primary/15 text-primary"
+                                )}
+                              >
+                                {order.status === "PENDING" ? <Clock className="h-3.5 w-3.5" /> : <Truck className="h-3.5 w-3.5" />}
+                              </button>
+                            </div>
+                          )}
                           <div title={isBackendDown ? "Backend is offline" : ""}>
                             <button
                               disabled={isBackendDown}
-                              onClick={() => updateOrderStatus(order.id, order.status === "PENDING" ? "SHIPPED" : "DELIVERED")}
+                              onClick={() => setConfirmId(order.id)}
                               className={cn(
                                 "p-1.5 rounded-md transition-colors",
-                                isBackendDown ? "opacity-30 cursor-not-allowed" : "hover:bg-primary/15 text-primary"
+                                isBackendDown ? "opacity-30 cursor-not-allowed" : "hover:bg-destructive/15 text-destructive/60 hover:text-destructive"
                               )}
                             >
-                              {order.status === "PENDING" ? <Clock className="h-3.5 w-3.5" /> : <Truck className="h-3.5 w-3.5" />}
+                              <Trash2 className="h-3.5 w-3.5" />
                             </button>
                           </div>
-                        )}
-                        <div title={isBackendDown ? "Backend is offline" : ""}>
-                          <button
-                            disabled={isBackendDown}
-                            onClick={() => setConfirmId(order.id)}
-                            className={cn(
-                              "p-1.5 rounded-md transition-colors",
-                              isBackendDown ? "opacity-30 cursor-not-allowed" : "hover:bg-destructive/15 text-destructive/60 hover:text-destructive"
-                            )}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
                         </div>
-                      </div>
+                      )}
                     </td>
                   </motion.tr>
                 ))
