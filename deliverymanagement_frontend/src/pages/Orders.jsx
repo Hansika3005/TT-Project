@@ -51,6 +51,11 @@ export default function Orders() {
   const { user, isBackendDown } = useAuthStore();
   const role = normalizeRole(user?.role);
   const canManageOrders = role === "ADMIN" || role === "DELIVERY_AGENT";
+  const ORDERS_UI_VERSION = "orders-ui-hide-actions-v2";
+
+  // Version marker to confirm the currently deployed UI is loaded.
+  // (Helps debug cases where Vercel redeploy didn't take effect for this user.)
+  console.log("[Orders UI]", { version: ORDERS_UI_VERSION, role, canManageOrders });
 
   const [search, setSearch]             = useState("");
   const [isModalOpen, setIsModalOpen]   = useState(false);
