@@ -78,6 +78,7 @@ export default function Orders() {
   );
 
   const handleExport = () => {
+    if (!canManageOrders) return;
     const csv = ["ID,Customer,Amount,Status,Date",
       ...roleFiltered.map((o) => `${o.id},${o.customerName},${o.amount},${o.status},${o.date}`)
     ].join("\n");
@@ -88,6 +89,7 @@ export default function Orders() {
   };
 
   const onSubmit = async (data) => {
+    if (!canManageOrders) return;
     if (isBackendDown) return;
     await createOrder({ ...data, amount: parseFloat(data.amount), date: new Date().toISOString(), status: "PENDING" });
     setIsModalOpen(false);
@@ -277,7 +279,11 @@ export default function Orders() {
       <ConfirmDialog
         isOpen={!!confirmId}
         onClose={() => setConfirmId(null)}
-        onConfirm={async () => { await deleteOrder(confirmId); setConfirmId(null); }}
+        onConfirm={async () => {
+          if (!canManageOrders) return;
+          await deleteOrder(confirmId);
+          setConfirmId(null);
+        }}
         title="Delete Order"
         message="This action is permanent and cannot be undone. Are you sure?"
       />
