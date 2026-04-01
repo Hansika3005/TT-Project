@@ -110,6 +110,7 @@ export default function Login() {
                         <option key={r.value} value={r.value}>{r.label}</option>
                       ))}
                     </select>
+                 
                   </div>
                 </div>
               </motion.div>
