@@ -4,34 +4,42 @@ import { useAuthStore } from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
 import { UI_ROLES, toBackendRole } from "../utils/roleMapping";
 import { Zap, User, Mail, Lock, ChevronDown } from "lucide-react";
 
 export default function Login() {
   const [isRegister, setIsRegister] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
-  const login       = useAuthStore((s) => s.login);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      role: "DELIVERY_AGENT", // ✅ RHF-managed default — ensures correct value even if user doesn't touch the dropdown
+    },
+  });
+
+  const login        = useAuthStore((s) => s.login);
   const registerUser = useAuthStore((s) => s.register);
-  const isLoading   = useAuthStore((s) => s.isLoading);
-  const navigate    = useNavigate();
+  const isLoading    = useAuthStore((s) => s.isLoading);
+  const navigate     = useNavigate();
 
   const toggleMode = () => { setIsRegister(!isRegister); reset(); };
 
   const onSubmit = async (data) => {
     try {
       if (isRegister) {
-        // Find the human-friendly label for the selected role value
-        const selectedRole = UI_ROLES.find(r => r.value === data.role);
-        
+        // ✅ data.role is now always defined (guaranteed by RHF defaultValues)
+        const selectedRole = UI_ROLES.find((r) => r.value === data.role);
+
         const success = await registerUser({
-          // Backend expects `username` (DTO field). We send it explicitly.
-          username: data.name,
-          email: data.email,
-          password: data.password,
-          role: toBackendRole(data.role),
-          displayRole: selectedRole?.label || "Customer",
+          username:    data.name,
+          email:       data.email,
+          password:    data.password,
+          role:        toBackendRole(data.role),
+          displayRole: selectedRole?.label ?? "Delivery Agent", // ✅ correct fallback
         });
         if (success) { setIsRegister(false); reset(); }
       } else {
@@ -43,10 +51,15 @@ export default function Login() {
 
   return (
     /* Glass card */
-    <div className="relative rounded-2xl overflow-hidden"
-         style={{ background: "hsl(222 44% 8% / 0.85)", backdropFilter: "blur(24px)",
-                  border: "1px solid hsl(255 80% 65% / 0.18)",
-                  boxShadow: "0 24px 80px hsl(0 0% 0% / 0.5), inset 0 1px 0 hsl(255 80% 65% / 0.1)" }}>
+    <div
+      className="relative rounded-2xl overflow-hidden"
+      style={{
+        background:     "hsl(222 44% 8% / 0.85)",
+        backdropFilter: "blur(24px)",
+        border:         "1px solid hsl(255 80% 65% / 0.18)",
+        boxShadow:      "0 24px 80px hsl(0 0% 0% / 0.5), inset 0 1px 0 hsl(255 80% 65% / 0.1)",
+      }}
+    >
       {/* Top gradient line */}
       <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-80" />
 
@@ -63,7 +76,9 @@ export default function Login() {
           <div className="text-center">
             <h1 className="text-2xl font-black tracking-tight text-white">DeliveryApp</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {isRegister ? "Create your account to get started" : "Welcome back — sign in to continue"}
+              {isRegister
+                ? "Create your account to get started"
+                : "Welcome back — sign in to continue"}
             </p>
           </div>
         </div>
@@ -81,7 +96,9 @@ export default function Login() {
               >
                 {/* Name */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Full Name</label>
+                  <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    Full Name
+                  </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
@@ -93,24 +110,31 @@ export default function Login() {
                       {...register("name", { required: "Name is required" })}
                     />
                   </div>
-                  {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+                  {errors.name && (
+                    <p className="text-xs text-destructive">{errors.name.message}</p>
+                  )}
                 </div>
 
-                {/* Role */}
+                {/* Role — ✅ fixed: no stray HTML attrs, no duplicate defaultValue */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Role</label>
+                  <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    Role
+                  </label>
                   <div className="relative">
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <select
-                        {...register("role", { value: "DELIVERY_AGENT" })}
-                      border border-border/40 bg-[#0d0d1a] focus:outline-none focus:ring-2 focus:ring-primary/50
-                    focus:border-primary/50 transition-all appearance-none cursor-pointer"
-                      >
+                      className="w-full h-10 pl-4 pr-9 rounded-lg text-sm text-white
+                                 border border-border/40 bg-[#0d0d1a] focus:outline-none focus:ring-2
+                                 focus:ring-primary/50 focus:border-primary/50 transition-all
+                                 appearance-none cursor-pointer"
+                      {...register("role")}
+                    >
                       {UI_ROLES.map((r) => (
-                        <option key={r.value} value={r.value}>{r.label}</option>
+                        <option key={r.value} value={r.value}>
+                          {r.label}
+                        </option>
                       ))}
                     </select>
-                 
                   </div>
                 </div>
               </motion.div>
@@ -119,7 +143,9 @@ export default function Login() {
 
           {/* Email */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Email</label>
+            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Email
+            </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -131,12 +157,16 @@ export default function Login() {
                 {...register("email", { required: "Email is required" })}
               />
             </div>
-            {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-xs text-destructive">{errors.email.message}</p>
+            )}
           </div>
 
           {/* Password */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Password</label>
+            <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Password
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
@@ -151,7 +181,9 @@ export default function Login() {
                 })}
               />
             </div>
-            {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-xs text-destructive">{errors.password.message}</p>
+            )}
           </div>
 
           <div className="pt-2">
@@ -162,8 +194,11 @@ export default function Login() {
 
           <p className="text-sm text-center text-muted-foreground pt-1">
             {isRegister ? "Already have an account? " : "Don't have an account? "}
-            <button type="button" onClick={toggleMode}
-              className="text-primary font-semibold hover:underline transition-colors">
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="text-primary font-semibold hover:underline transition-colors"
+            >
               {isRegister ? "Sign In" : "Register"}
             </button>
           </p>
