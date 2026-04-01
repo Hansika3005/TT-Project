@@ -102,11 +102,11 @@ export default function Login() {
                   <div className="relative">
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <select
-                      className="w-full h-10 pl-4 pr-9 rounded-lg text-sm text-white
-                                 border border-border/40 bg-[#0d0d1a] focus:outline-none focus:ring-2 focus:ring-primary/50
-                                 focus:border-primary/50 transition-all appearance-none cursor-pointer"
-                      {...register("role")}
-                    >
+                      defaultValue="DELIVERY_AGENT"   // 🔥 ADD THIS LINEclassName="w-full h-10 pl-4 pr-9 rounded-lg text-sm text-white
+                      border border-border/40 bg-[#0d0d1a] focus:outline-none focus:ring-2 focus:ring-primary/50
+                    focus:border-primary/50 transition-all appearance-none cursor-pointer"
+                    {...register("role") 
+                      >
                       {UI_ROLES.map((r) => (
                         <option key={r.value} value={r.value}>{r.label}</option>
                       ))}
