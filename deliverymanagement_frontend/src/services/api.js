@@ -112,9 +112,7 @@ api.interceptors.response.use(
     } else if (error.request) {
       // No response received — backend is likely offline
       setBackendDown(true);
-      if (!suppressGlobalErrorToast) {
-        showToast('Backend is waking up on Render. Please wait up to 1 minute and retry.');
-      }
+      // Avoid noisy popups during Render cold starts; banner already informs the user.
       console.warn('[API]: Connection failed. Backend status set to OFFLINE.');
     } else {
       if (error.message !== 'Backend is offline' && !suppressGlobalErrorToast) {
